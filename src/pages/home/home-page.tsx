@@ -1,38 +1,51 @@
-import { FlatList, View } from "react-native";
+import { Dimensions, FlatList, View } from "react-native";
 import { styleSheet } from "./home-page.styles";
 import { useStyles } from "react-native-unistyles";
-import HabitCard from "./components/habit-card";
-import { Habit } from "@/models/habit";
+import HabitCard, { habitCompletedEvent } from "./components/habit-card";
+import { useLiveQuery } from "drizzle-orm/expo-sqlite";
+import { db } from "@/db";
+import * as schema from "@/db/schema";
+import { IconInbox } from "@tabler/icons-react-native";
+import ConfettiCannon from "react-native-confetti-cannon";
+import { useRef } from "react";
+import { useEvent } from "@/hooks/use-event";
 
-const mockHabits: Habit[] = [
-  {
-    id: "1",
-    title: "Eat healthy",
-    dailyGoal: "Eat at least 3 servings of fruits and vegetables per day",
-    completionDates: ["2023-01-01", "2023-02-01", "2023-03-01"],
-    creationDate: "2023-01-01",
-  },
-  {
-    id: "2",
-    title: "Exercise",
-    dailyGoal: "Do at least 10 minutes of moderate-intensity exercise per day",
-    completionDates: ["2023-01-01", "2023-02-01", "2023-03-01"],
-    creationDate: "2023-01-01",
-  },
-];
+const { width } = Dimensions.get("window");
 
 export default function HomePage() {
-  const { styles } = useStyles(styleSheet);
+  const { styles, theme } = useStyles(styleSheet);
+  const confettiRef = useRef<ConfettiCannon>(null);
+
+  const { data } = useLiveQuery(db.select().from(schema.habitsTable));
+  const habits = data?.map(schema.tableSchemaToHabit) ?? [];
+
+  useEvent(habitCompletedEvent, () => confettiRef.current?.start());
+
+  // const habits = [];
 
   return (
-    <FlatList
-      style={styles.mainList}
-      contentContainerStyle={styles.mainListContainer}
-      data={mockHabits}
-      renderItem={({ item }) => <HabitCard habit={item} />}
-      keyExtractor={(item) => item.id}
-      contentInsetAdjustmentBehavior="automatic"
-      ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
-    />
+    <>
+      <FlatList
+        style={styles.mainList}
+        contentContainerStyle={styles.mainListContainer}
+        data={habits}
+        renderItem={({ item }) => <HabitCard habit={item} />}
+        keyExtractor={(item) => item.id}
+        contentInsetAdjustmentBehavior="automatic"
+        ItemSeparatorComponent={() => <View style={styles.listItemSeparator} />}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyListComponent}>
+            <IconInbox size={120} color={theme.colors.foregroundSecondary} />
+          </View>
+        )}
+      />
+      <ConfettiCannon
+        ref={confettiRef}
+        count={200}
+        origin={{ x: width / 2, y: 0 }}
+        fadeOut
+        autoStart={false}
+      />
+    </>
   );
 }

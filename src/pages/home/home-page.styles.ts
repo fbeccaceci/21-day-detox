@@ -16,4 +16,11 @@ export const styleSheet = createStyleSheet((theme, runtime) => ({
   listItemSeparator: {
     height: theme.margins.md,
   },
+
+  emptyListComponent: {
+    minHeight: "60%",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+  },
 }));

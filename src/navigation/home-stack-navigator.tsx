@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Button, PlatformColor, Pressable, Text, View } from "react-native";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
 import { IconPlus } from "@tabler/icons-react-native";
+import { db } from "@/db";
+import { habitsTable, habitToTableSchema } from "@/db/schema";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,7 +21,7 @@ export default function HomeStackNavigator() {
       return false;
     }
     const habit = newHabit.value;
-    console.log("New habit:", habit);
+    db.insert(habitsTable).values(habitToTableSchema(habit)).execute();
     return true;
   }
 

@@ -1,22 +1,31 @@
 import { createStyleSheet } from "react-native-unistyles";
+import type { HabitStatus } from "./habit-card";
 
 export const styleSheet = createStyleSheet((theme) => ({
-  container: {
-    backgroundColor: theme.colors.backgroundElevated,
-    borderRadius: theme.radiuses.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.borders,
-    padding: theme.margins.lg,
+  container: (status: HabitStatus) => {
+    const containerStatusColorMap: Record<HabitStatus, string> = {
+      active: theme.colors.backgroundElevated,
+      completed: "#395242",
+      expired: "#E86D68",
+    };
 
-    minHeight: 100,
+    return {
+      backgroundColor: containerStatusColorMap[status],
+      borderRadius: theme.radiuses.lg,
+      borderWidth: 1,
+      borderColor: theme.colors.borders,
+      padding: theme.margins.lg,
 
-    shadowColor: theme.colors.borders,
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+      minHeight: 100,
+
+      shadowColor: theme.colors.borders,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    };
   },
 
   title: {
@@ -25,14 +34,13 @@ export const styleSheet = createStyleSheet((theme) => ({
     fontSize: 20,
   },
 
-  description: {
-    color: theme.colors.foregroundSecondary,
-  },
+  description: (status: HabitStatus) => ({
+    color: status === "expired" ? theme.colors.foreground : theme.colors.foregroundSecondary,
+  }),
 
   completionItemsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    // justifyContent: "space-between",
     flexWrap: "wrap",
 
     marginTop: theme.margins.md,
