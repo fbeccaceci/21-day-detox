@@ -42,7 +42,7 @@ export default function HomePage() {
       <ConfettiCannon
         ref={confettiRef}
         count={200}
-        origin={{ x: width / 2, y: 0 }}
+        origin={{ x: width / 2, y: -30 }}
         fadeOut
         autoStart={false}
       />
